@@ -129,7 +129,7 @@
                 <div>
                   <a
                     v-if="isDocUploaded(docType)"
-                    :href="`http://localhost:5001${getDocFileUrl(docType)}`"
+                    :href="getDocFileUrl(docType)"
                     target="_blank"
                     class="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white transition shadow flex items-center space-x-1.5"
                   >
@@ -204,7 +204,9 @@ const isDocUploaded = (docType) => {
 
 const getDocFileUrl = (docType) => {
   const doc = documents.value.find(d => d.documentType === docType);
-  return doc ? doc.fileUrl : '';
+  if (!doc) return '#';
+  if (doc.fileUrl.startsWith('http')) return doc.fileUrl;
+  return `https://applications-backend-zpxu.onrender.com${doc.fileUrl}`;
 };
 
 const formatDocType = (type) => {

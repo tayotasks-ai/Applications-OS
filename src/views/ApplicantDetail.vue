@@ -247,7 +247,7 @@
                   <!-- File Download / View Link -->
                   <a
                     v-if="isDocUploaded(docType)"
-                    :href="`http://localhost:5001${getDocFileUrl(docType)}`"
+                    :href="getDocFileUrl(docType)"
                     target="_blank"
                     class="px-3 py-1.5 rounded-lg border border-gray-700 hover:border-gray-500 bg-gray-800 text-xs text-gray-300 font-semibold hover:text-white transition"
                   >
@@ -480,7 +480,9 @@ const isDocVerified = (docType) => {
 
 const getDocFileUrl = (docType) => {
   const doc = documents.value.find(d => d.documentType === docType);
-  return doc ? doc.fileUrl : '';
+  if (!doc) return '#';
+  if (doc.fileUrl.startsWith('http')) return doc.fileUrl;
+  return `https://applications-backend-zpxu.onrender.com${doc.fileUrl}`;
 };
 
 const formatDocType = (type) => {

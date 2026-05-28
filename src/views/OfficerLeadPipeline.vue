@@ -252,7 +252,7 @@ const loading = ref(true);
 const selectedOfficerId = ref('');
 const applicationOfficers = ref([]);
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = 'https://applications-backend-zpxu.onrender.com/api';
 
 // Fetch users to populate Team Lead workload filters
 const fetchOfficers = async () => {

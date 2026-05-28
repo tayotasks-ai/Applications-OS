@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = 'https://applications-backend-zpxu.onrender.com/api';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
