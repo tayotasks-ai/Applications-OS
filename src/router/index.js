@@ -10,6 +10,7 @@ import OfficerApplicantDetail from '../views/OfficerApplicantDetail.vue';
 import Billing from '../views/Billing.vue';
 import Landing from '../views/Landing.vue';
 import OfficerLeadPipeline from '../views/OfficerLeadPipeline.vue';
+import Register from '../views/Register.vue';
 
 const routes = [
   {
@@ -27,6 +28,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
     meta: { guestOnly: true }
   },
   {

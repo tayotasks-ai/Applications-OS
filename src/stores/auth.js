@@ -54,6 +54,40 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async registerAgency(organizationName, name, email, password) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await fetch(`${API_URL}/auth/register-agency`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ organizationName, name, email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed.');
+        }
+
+        this.token = data.token;
+        this.user = data.user;
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        return true;
+      } catch (err) {
+        console.error('Register agency action error:', err);
+        this.error = err.message || 'Server error. Please try again.';
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     logout() {
       this.token = '';
       this.user = null;

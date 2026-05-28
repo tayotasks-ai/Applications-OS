@@ -21,7 +21,7 @@
             Sign In
           </router-link>
           <router-link
-            to="/login"
+            to="/register"
             class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg hover:shadow-brand-500/25 transition duration-150"
           >
             Start Free Trial
@@ -46,7 +46,7 @@
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
         <router-link
-          to="/login"
+          to="/register"
           class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-base shadow-xl hover:shadow-brand-500/25 transition duration-150 text-center"
         >
           Claim 14-Day Free Trial
@@ -165,7 +165,7 @@
             </ul>
           </div>
           <router-link
-            to="/login"
+            to="/register"
             class="w-full py-3 text-xs font-bold rounded-xl bg-gray-850 hover:bg-gray-800 text-center text-white border border-gray-700 transition"
           >
             Get Started
@@ -186,7 +186,7 @@
             </ul>
           </div>
           <router-link
-            to="/login"
+            to="/register"
             class="w-full py-3 text-xs font-bold rounded-xl bg-brand-600 hover:bg-brand-500 text-center text-white shadow hover:shadow-brand-500/20 transition"
           >
             Claim Free Trial
