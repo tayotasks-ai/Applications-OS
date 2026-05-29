@@ -728,7 +728,7 @@ const fetchTeamDirectory = async () => {
 const getSeatLimit = () => {
   const tier = authStore.user?.tenant?.planTier || 'Free';
   if (tier === 'Free') return 1;
-  if (tier === 'Growth') return 15;
+  if (tier === 'Growth') return 50;
   return Infinity;
 };
 

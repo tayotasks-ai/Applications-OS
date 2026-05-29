@@ -151,7 +151,7 @@
             <div class="text-3xl font-extrabold text-white">₦25,000 <span class="text-xs text-gray-500">/ month</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">Designed for small to mid-sized travel agencies expanding enrollment pipelines.</p>
             <ul class="text-xs text-gray-300 space-y-2 pt-2">
-              <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> 5 Counselor Seats</li>
+              <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> 50 Counselor Seats</li>
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> All 7 Mandatory Documents</li>
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> Kanban Application Boards</li>
             </ul>
@@ -170,7 +170,7 @@
         <div class="glass-panel p-6 rounded-2xl border border-gray-800 flex flex-col justify-between h-[380px]" :class="{ 'border-brand-500/40 bg-brand-950/5': orgPlan === 'Enterprise' }">
           <div class="space-y-4">
             <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Enterprise</h4>
-            <div class="text-3xl font-extrabold text-white">₦75,000 <span class="text-xs text-gray-500">/ month</span></div>
+            <div class="text-3xl font-extrabold text-white">₦100,000 <span class="text-xs text-gray-500">/ month</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">For massive international networks requiring zero seat ceilings.</p>
             <ul class="text-xs text-gray-300 space-y-2 pt-2">
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> Unlimited Counselor Seats</li>
@@ -299,7 +299,7 @@ const activeStorage = computed(() => authStore.value.user?.tenant?.storageUsedGB
 
 const maxSeats = computed(() => {
   if (orgPlan.value === 'Free') return 1;
-  if (orgPlan.value === 'Growth') return 15;
+  if (orgPlan.value === 'Growth') return 50;
   return Infinity;
 });
 
