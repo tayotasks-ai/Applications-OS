@@ -113,7 +113,7 @@
           </div>
 
           <button
-            @click="triggerCheckout"
+            @click="selectPlan('Growth')"
             :disabled="checkoutLoading"
             class="w-full py-3 mt-6 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-sm font-bold shadow-lg transition duration-200 flex items-center justify-center space-x-2"
           >
@@ -157,7 +157,7 @@
             </ul>
           </div>
           <button
-            @click="triggerCheckout"
+            @click="selectPlan('Growth')"
             :disabled="orgPlan === 'Growth'"
             class="w-full py-2.5 text-xs font-bold rounded-lg transition"
             :class="orgPlan === 'Growth' ? 'border border-brand-500/30 text-brand-400 bg-brand-900/10 cursor-default' : 'bg-brand-600 hover:bg-brand-500 text-white shadow'"
@@ -179,7 +179,7 @@
             </ul>
           </div>
           <button
-            @click="triggerCheckout"
+            @click="selectPlan('Enterprise')"
             :disabled="orgPlan === 'Enterprise'"
             class="w-full py-2.5 text-xs font-bold rounded-lg transition"
             :class="orgPlan === 'Enterprise' ? 'border border-brand-500/30 text-brand-400 bg-brand-900/10 cursor-default' : 'bg-brand-600 hover:bg-brand-500 text-white shadow'"
@@ -261,11 +261,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = ref(useAuthStore());
 
 const checkoutLoading = ref(false);
@@ -340,36 +341,42 @@ const getStatusClass = (status) => {
   }
 };
 
-const triggerCheckout = () => {
+const selectPlan = async (planTier) => {
   checkoutLoading.value = true;
-  setTimeout(() => {
+  try {
+    const API_URL = 'https://applications-backend-zpxu.onrender.com/api';
+    const response = await fetch(`${API_URL}/billing/initialize-transaction`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authStore.value.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ planTier })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to initialize Paystack checkout.');
+    }
+
+    // Redirect to Paystack secure hosted transaction page
+    window.location.href = data.authorization_url;
+  } catch (err) {
+    triggerToast(err.message, 'error');
+  } finally {
     checkoutLoading.value = false;
-    showCheckoutConfirmModal.value = true;
-  }, 600);
+  }
 };
 
-const handleConfirmCheckout = () => {
-  showCheckoutConfirmModal.value = false;
-  
-  // Trigger Custom Toast
-  triggerToast("Simulated Checkout Success! Redirecting back to dashboard.", "success");
-  
-  // Update local storage tenant details for reactive UI refresh
-  const userObj = JSON.parse(localStorage.getItem('user'));
-  if (userObj && userObj.tenant) {
-    userObj.tenant.subscriptionStatus = 'active';
-    userObj.tenant.planTier = 'Growth';
-    userObj.tenant.currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    localStorage.setItem('user', JSON.stringify(userObj));
-    
-    // Reload state
-    authStore.value.user = userObj;
+onMounted(async () => {
+  if (route.query.payment === 'success') {
+    triggerToast("Payment successful! Synchronizing active subscription status...", "success");
+    // Trigger reactive user profile refresh from backend
+    await authStore.value.fetchCurrentUser();
+    // Clean up URL query parameters
+    router.replace({ query: {} });
   }
-  
-  setTimeout(() => {
-    goBack();
-  }, 1500);
-};
+});
 </script>
 
 <style>
