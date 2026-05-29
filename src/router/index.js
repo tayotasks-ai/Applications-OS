@@ -11,6 +11,7 @@ import Billing from '../views/Billing.vue';
 import Landing from '../views/Landing.vue';
 import OfficerLeadPipeline from '../views/OfficerLeadPipeline.vue';
 import Register from '../views/Register.vue';
+import RootDashboard from '../views/RootDashboard.vue';
 
 const routes = [
   {
@@ -35,6 +36,12 @@ const routes = [
     name: 'Register',
     component: Register,
     meta: { guestOnly: true }
+  },
+  {
+    path: '/root/dashboard',
+    name: 'RootDashboard',
+    component: RootDashboard,
+    meta: { requiresAuth: true, roles: ['Root'] }
   },
   {
     path: '/counselor/dashboard',
@@ -78,6 +85,7 @@ const routes = [
       const authStore = useAuthStore();
       if (!authStore.isAuthenticated) return '/login';
       
+      if (authStore.isRoot) return '/root/dashboard';
       if (authStore.isCounselor) return '/counselor/dashboard';
       if (authStore.isOfficer) return '/officer/pipeline';
       if (authStore.isOfficerLead) return '/lead/pipeline';
@@ -97,7 +105,9 @@ router.beforeEach(async (to, from, next) => {
 
   // If user is already authenticated and visits public landing page, forward directly to dashboard
   if (to.path === '/' && authStore.isAuthenticated) {
-    if (authStore.isCounselor) {
+    if (authStore.isRoot) {
+      return next('/root/dashboard');
+    } else if (authStore.isCounselor) {
       return next('/counselor/dashboard');
     } else if (authStore.isOfficer) {
       return next('/officer/pipeline');
@@ -115,7 +125,9 @@ router.beforeEach(async (to, from, next) => {
     // Check role access
     if (to.meta.roles && !to.meta.roles.includes(authStore.userRole)) {
       // Redirect to correct dashboard based on actual role
-      if (authStore.isCounselor) {
+      if (authStore.isRoot) {
+        return next('/root/dashboard');
+      } else if (authStore.isCounselor) {
         return next('/counselor/dashboard');
       } else if (authStore.isOfficer) {
         return next('/officer/pipeline');
@@ -130,7 +142,9 @@ router.beforeEach(async (to, from, next) => {
 
   // If page is guest only (e.g. Login) and user is authenticated, redirect
   if (to.meta.guestOnly && authStore.isAuthenticated) {
-    if (authStore.isCounselor) {
+    if (authStore.isRoot) {
+      return next('/root/dashboard');
+    } else if (authStore.isCounselor) {
       return next('/counselor/dashboard');
     } else if (authStore.isOfficer) {
       return next('/officer/pipeline');

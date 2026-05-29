@@ -70,40 +70,6 @@
         </p>
       </div>
 
-      <!-- Testing Seeds Panel -->
-      <div class="mt-8 pt-6 border-t border-gray-800 text-left">
-        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Quick Demo Logins (Click to autofill)</h4>
-        <div class="space-y-2 text-xs">
-          <button
-            @click="quickFill('counselor@agency.com')"
-            class="w-full flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 hover:bg-brand-600/10 border border-gray-700/50 hover:border-brand-500/30 transition text-gray-300"
-          >
-            <span>Sarah (Counselor)</span>
-            <span class="text-brand-400 font-mono">counselor@agency.com</span>
-          </button>
-          <button
-            @click="quickFill('officer@agency.com')"
-            class="w-full flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 hover:bg-brand-600/10 border border-gray-700/50 hover:border-brand-500/30 transition text-gray-300"
-          >
-            <span>Alex (App Officer)</span>
-            <span class="text-brand-400 font-mono">officer@agency.com</span>
-          </button>
-          <button
-            @click="quickFill('lead@agency.com')"
-            class="w-full flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 hover:bg-brand-600/10 border border-gray-700/50 hover:border-brand-500/30 transition text-gray-300"
-          >
-            <span>David (App Director/Lead)</span>
-            <span class="text-brand-400 font-mono">lead@agency.com</span>
-          </button>
-          <button
-            @click="quickFill('admin@agency.com')"
-            class="w-full flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 hover:bg-brand-600/10 border border-gray-700/50 hover:border-brand-500/30 transition text-gray-300"
-          >
-            <span>John (Admin)</span>
-            <span class="text-brand-400 font-mono">admin@agency.com</span>
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -127,7 +93,9 @@ const handleLogin = async () => {
   
   const success = await authStore.login(email.value, password.value);
   if (success) {
-    if (authStore.isCounselor) {
+    if (authStore.user?.role === 'Root') {
+      router.push('/root/dashboard');
+    } else if (authStore.isCounselor) {
       router.push('/counselor/dashboard');
     } else if (authStore.isOfficer) {
       router.push('/officer/pipeline');
@@ -138,10 +106,5 @@ const handleLogin = async () => {
     error.value = authStore.error || 'Failed to authenticate.';
     loading.value = false;
   }
-};
-
-const quickFill = (demoEmail) => {
-  email.value = demoEmail;
-  password.value = 'password123';
 };
 </script>
