@@ -89,6 +89,13 @@
             <span class="text-brand-400 font-mono">officer@agency.com</span>
           </button>
           <button
+            @click="quickFill('lead@agency.com')"
+            class="w-full flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 hover:bg-brand-600/10 border border-gray-700/50 hover:border-brand-500/30 transition text-gray-300"
+          >
+            <span>David (App Director/Lead)</span>
+            <span class="text-brand-400 font-mono">lead@agency.com</span>
+          </button>
+          <button
             @click="quickFill('admin@agency.com')"
             class="w-full flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 hover:bg-brand-600/10 border border-gray-700/50 hover:border-brand-500/30 transition text-gray-300"
           >
