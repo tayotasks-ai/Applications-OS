@@ -265,6 +265,31 @@
         </form>
       </div>
     </div>
+
+    <!-- Floating Toast Notification System -->
+    <transition name="toast-fade">
+      <div
+        v-if="toast.show"
+        class="fixed top-6 right-6 z-50 flex items-center space-x-3 px-5 py-4 rounded-xl backdrop-blur-md border shadow-2xl transition-all duration-300 max-w-md"
+        :class="toast.type === 'success' ? 'bg-slate-900/90 border-emerald-500/30 text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.15)]' : 'bg-slate-900/90 border-red-500/30 text-red-100 shadow-[0_0_20px_rgba(239,68,68,0.15)]'"
+      >
+        <span class="shrink-0">
+          <svg v-if="toast.type === 'success'" class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg v-else class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </span>
+        <span class="text-sm font-semibold pr-4 leading-snug">{{ toast.message }}</span>
+        <button
+          @click="toast.show = false"
+          class="text-gray-400 hover:text-white transition text-base font-bold select-none shrink-0"
+        >
+          &times;
+        </button>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -285,6 +310,23 @@ const showReturnModal = ref(false);
 const submittingReturn = ref(false);
 const returnReason = ref('');
 const targetApplicantId = ref('');
+
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success'
+});
+let toastTimeout = null;
+
+const triggerToast = (message, type = 'success') => {
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toast.value.message = message;
+  toast.value.type = type;
+  toast.value.show = true;
+  toastTimeout = setTimeout(() => {
+    toast.value.show = false;
+  }, 4000);
+};
 
 const loadData = () => {
   applicantsStore.fetchApplicants();
@@ -315,9 +357,9 @@ const submitReturnRequest = async () => {
     await applicantsStore.requestReturn(targetApplicantId.value, returnReason.value);
     closeReturnModal();
     loadData(); // refresh list
-    alert('Success: Return request sent to senior officer.');
+    triggerToast('Success: Return request sent to senior officer.', 'success');
   } catch (err) {
-    alert('Failed to request return: ' + err.message);
+    triggerToast('Failed to request return: ' + err.message, 'error');
   } finally {
     submittingReturn.value = false;
   }
@@ -327,8 +369,9 @@ const promoteStatus = async (id, nextStatus) => {
   try {
     await applicantsStore.updateApplicantStatus(id, nextStatus);
     loadData(); // reload
+    triggerToast('Application progressed successfully!', 'success');
   } catch (err) {
-    alert('Failed to update status: ' + err.message);
+    triggerToast('Failed to update status: ' + err.message, 'error');
   }
 };
 
@@ -341,3 +384,18 @@ const handleLogout = () => {
   router.push('/login');
 };
 </script>
+
+<style>
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+</style>

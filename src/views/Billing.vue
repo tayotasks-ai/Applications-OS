@@ -190,6 +190,73 @@
 
       </div>
     </main>
+
+    <!-- CHECKOUT SIMULATOR CONFIRMATION MODAL -->
+    <div
+      v-if="showCheckoutConfirmModal"
+      class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm"
+    >
+      <div class="w-full max-w-md glass-panel p-8 rounded-2xl shadow-2xl relative overflow-hidden space-y-6">
+        <!-- Glow accent -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-500 rounded-full blur-3xl opacity-20"></div>
+
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+          <h3 class="text-xl font-extrabold text-white">Simulate Gateway Checkout</h3>
+          <button @click="showCheckoutConfirmModal = false" class="text-gray-400 hover:text-white transition text-lg">&times;</button>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-sm text-gray-300 leading-relaxed">
+            [Sandbox Mode] Click below to simulate an active gateway payment redirection and response.
+          </p>
+          <p class="text-xs text-gray-400 italic">
+            This will update your subscription to the active Growth tier, enabling multi-tenant team seats.
+          </p>
+        </div>
+
+        <div class="pt-4 flex space-x-3">
+          <button
+            type="button"
+            @click="showCheckoutConfirmModal = false"
+            class="w-1/2 py-3 rounded-xl border border-gray-700 hover:border-gray-500 text-sm font-semibold text-gray-300 hover:text-white transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            @click="handleConfirmCheckout"
+            class="w-1/2 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-bold transition shadow shadow-brand-500/20"
+          >
+            Simulate Success
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Toast Notification System -->
+    <transition name="toast-fade">
+      <div
+        v-if="toast.show"
+        class="fixed top-6 right-6 z-50 flex items-center space-x-3 px-5 py-4 rounded-xl backdrop-blur-md border shadow-2xl transition-all duration-300 max-w-md"
+        :class="toast.type === 'success' ? 'bg-slate-900/90 border-emerald-500/30 text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.15)]' : 'bg-slate-900/90 border-red-500/30 text-red-100 shadow-[0_0_20px_rgba(239,68,68,0.15)]'"
+      >
+        <span class="shrink-0">
+          <svg v-if="toast.type === 'success'" class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg v-else class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </span>
+        <span class="text-sm font-semibold pr-4 leading-snug">{{ toast.message }}</span>
+        <button
+          @click="toast.show = false"
+          class="text-gray-400 hover:text-white transition text-base font-bold select-none shrink-0"
+        >
+          &times;
+        </button>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -202,6 +269,24 @@ const router = useRouter();
 const authStore = ref(useAuthStore());
 
 const checkoutLoading = ref(false);
+const showCheckoutConfirmModal = ref(false);
+
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success'
+});
+let toastTimeout = null;
+
+const triggerToast = (message, type = 'success') => {
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toast.value.message = message;
+  toast.value.type = type;
+  toast.value.show = true;
+  toastTimeout = setTimeout(() => {
+    toast.value.show = false;
+  }, 4000);
+};
 
 const orgPlan = computed(() => authStore.value.user?.tenant?.planTier || 'Free');
 const orgStatus = computed(() => authStore.value.user?.tenant?.subscriptionStatus || 'trialing');
@@ -257,35 +342,47 @@ const getStatusClass = (status) => {
 
 const triggerCheckout = () => {
   checkoutLoading.value = true;
-  
-  // Simulate API call to backend generating redirection
   setTimeout(() => {
     checkoutLoading.value = false;
+    showCheckoutConfirmModal.value = true;
+  }, 600);
+};
+
+const handleConfirmCheckout = () => {
+  showCheckoutConfirmModal.value = false;
+  
+  // Trigger Custom Toast
+  triggerToast("Simulated Checkout Success! Redirecting back to dashboard.", "success");
+  
+  // Update local storage tenant details for reactive UI refresh
+  const userObj = JSON.parse(localStorage.getItem('user'));
+  if (userObj && userObj.tenant) {
+    userObj.tenant.subscriptionStatus = 'active';
+    userObj.tenant.planTier = 'Growth';
+    userObj.tenant.currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    localStorage.setItem('user', JSON.stringify(userObj));
     
-    // In production:
-    // const res = await fetch('/api/billing/create-checkout-session');
-    // const { url } = await res.json();
-    // window.location.href = url; // redirect to Stripe/Paystack Checkout
-    
-    // E2E mock callback trigger
-    const confirmPayment = confirm("[Sandbox] Generate checkout redirection?\nClick OK to simulate gateway success, which triggers backend sync.");
-    if (confirmPayment) {
-      alert("Simulated Checkout Success! Redirecting back to dashboard.");
-      
-      // Update local storage tenant details for reactive UI refresh
-      const userObj = JSON.parse(localStorage.getItem('user'));
-      if (userObj && userObj.tenant) {
-        userObj.tenant.subscriptionStatus = 'active';
-        userObj.tenant.planTier = 'Growth';
-        userObj.tenant.currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('user', JSON.stringify(userObj));
-        
-        // Reload state
-        authStore.value.user = userObj;
-      }
-      
-      goBack();
-    }
-  }, 1000);
+    // Reload state
+    authStore.value.user = userObj;
+  }
+  
+  setTimeout(() => {
+    goBack();
+  }, 1500);
 };
 </script>
+
+<style>
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+</style>

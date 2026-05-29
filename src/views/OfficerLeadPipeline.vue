@@ -350,6 +350,73 @@
       </div>
     </main>
   </div>
+
+  <!-- Floating Toast Notification System -->
+  <transition name="toast-fade">
+    <div
+      v-if="toast.show"
+      class="fixed top-6 right-6 z-50 flex items-center space-x-3 px-5 py-4 rounded-xl backdrop-blur-md border shadow-2xl transition-all duration-300 max-w-md"
+      :class="toast.type === 'success' ? 'bg-slate-900/90 border-emerald-500/30 text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.15)]' : 'bg-slate-900/90 border-red-500/30 text-red-100 shadow-[0_0_20px_rgba(239,68,68,0.15)]'"
+    >
+      <span class="shrink-0">
+        <svg v-if="toast.type === 'success'" class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+        <svg v-else class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </span>
+      <span class="text-sm font-semibold pr-4 leading-snug">{{ toast.message }}</span>
+      <button
+        @click="toast.show = false"
+        class="text-gray-400 hover:text-white transition text-base font-bold select-none shrink-0"
+      >
+        &times;
+      </button>
+    </div>
+  </transition>
+
+  <!-- CUSTOM RETURN TO COUNSELING CONFIRMATION MODAL -->
+  <div
+    v-if="showReturnConfirmModal"
+    class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm"
+  >
+    <div class="w-full max-w-md glass-panel p-8 rounded-2xl shadow-2xl relative overflow-hidden space-y-6">
+      <!-- Glow accent -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-orange-500 rounded-full blur-3xl opacity-15"></div>
+
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <h3 class="text-xl font-extrabold text-white">Confirm Counseling Return</h3>
+        <button @click="showReturnConfirmModal = false" class="text-gray-400 hover:text-white transition text-lg">&times;</button>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-sm text-gray-300 leading-relaxed">
+          Are you sure you want to approve returning this applicant back to counseling?
+        </p>
+        <p class="text-xs text-orange-400 italic">
+          This action will clear all current officer assignments and transfer operational responsibility back to the counseling team.
+        </p>
+      </div>
+
+      <div class="pt-4 flex space-x-3">
+        <button
+          type="button"
+          @click="showReturnConfirmModal = false"
+          class="w-1/2 py-3 rounded-xl border border-gray-700 hover:border-gray-500 text-sm font-semibold text-gray-300 hover:text-white transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          @click="handleConfirmReturn"
+          class="w-1/2 py-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold transition shadow shadow-orange-500/20"
+        >
+          Confirm & Return
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -365,6 +432,26 @@ const applicantsStore = useApplicantsStore();
 const loading = ref(true);
 const selectedOfficerId = ref('');
 const applicationOfficers = ref([]);
+
+const showReturnConfirmModal = ref(false);
+const selectedReturnApplicantId = ref('');
+
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success'
+});
+let toastTimeout = null;
+
+const triggerToast = (message, type = 'success') => {
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toast.value.message = message;
+  toast.value.type = type;
+  toast.value.show = true;
+  toastTimeout = setTimeout(() => {
+    toast.value.show = false;
+  }, 4000);
+};
 
 const API_URL = 'https://applications-backend-zpxu.onrender.com/api';
 
@@ -426,28 +513,33 @@ const assignOfficer = async (id, officerId) => {
     loading.value = true;
     await applicantsStore.updateApplicantIntake(id, { assignedOfficer: officerId || null });
     await loadData();
-    alert('Success: Case assigned to officer.');
+    triggerToast('Success: Case assigned to officer.', 'success');
   } catch (err) {
-    alert('Failed to assign officer: ' + err.message);
+    triggerToast('Failed to assign officer: ' + err.message, 'error');
   } finally {
     loading.value = false;
   }
 };
 
 // Senior Officer approves lead return to counseling department
-const approveReturn = async (id) => {
-  if (!confirm('Are you sure you want to approve returning this applicant back to counseling? It will clear officer assignments.')) {
-    return;
-  }
+const approveReturn = (id) => {
+  selectedReturnApplicantId.value = id;
+  showReturnConfirmModal.value = true;
+};
+
+const handleConfirmReturn = async () => {
+  const id = selectedReturnApplicantId.value;
+  showReturnConfirmModal.value = false;
   try {
     loading.value = true;
     await applicantsStore.updateApplicantStatus(id, 'IN_COUNSELING');
     await loadData();
-    alert('Success: Applicant returned back to Counseling.');
+    triggerToast('Success: Applicant returned back to Counseling.', 'success');
   } catch (err) {
-    alert('Failed to return applicant: ' + err.message);
+    triggerToast('Failed to return applicant: ' + err.message, 'error');
   } finally {
     loading.value = false;
+    selectedReturnApplicantId.value = '';
   }
 };
 
@@ -457,8 +549,9 @@ const promoteStatus = async (id, nextStatus) => {
     loading.value = true;
     await applicantsStore.updateApplicantStatus(id, nextStatus);
     await applicantsStore.fetchApplicants(); // refresh
+    triggerToast('Application status updated successfully!', 'success');
   } catch (err) {
-    alert('Failed to update applicant state: ' + err.message);
+    triggerToast('Failed to update applicant state: ' + err.message, 'error');
   } finally {
     loading.value = false;
   }
@@ -473,3 +566,18 @@ const handleLogout = () => {
   router.push('/login');
 };
 </script>
+
+<style>
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+</style>
