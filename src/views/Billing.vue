@@ -148,7 +148,7 @@
           <div class="absolute -top-3 right-6 px-3 py-1 rounded-full bg-brand-600 text-white text-[10px] font-extrabold uppercase tracking-wider shadow">Best Value</div>
           <div class="space-y-4">
             <h4 class="text-sm font-bold text-brand-400 uppercase tracking-widest">Growth Plan</h4>
-            <div class="text-3xl font-extrabold text-white">₦25,000 <span class="text-xs text-gray-500">/ month</span></div>
+            <div class="text-3xl font-extrabold text-white">₦100,000 <span class="text-xs text-gray-500">/ month</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">Designed for small to mid-sized travel agencies expanding enrollment pipelines.</p>
             <ul class="text-xs text-gray-300 space-y-2 pt-2">
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> 50 Counselor Seats</li>
@@ -170,7 +170,7 @@
         <div class="glass-panel p-6 rounded-2xl border border-gray-800 flex flex-col justify-between h-[380px]" :class="{ 'border-brand-500/40 bg-brand-950/5': orgPlan === 'Enterprise' }">
           <div class="space-y-4">
             <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Enterprise</h4>
-            <div class="text-3xl font-extrabold text-white">₦100,000 <span class="text-xs text-gray-500">/ month</span></div>
+            <div class="text-3xl font-extrabold text-white">₦250,000 <span class="text-xs text-gray-500">/ month</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">For massive international networks requiring zero seat ceilings.</p>
             <ul class="text-xs text-gray-300 space-y-2 pt-2">
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2"></span> Unlimited Counselor Seats</li>
