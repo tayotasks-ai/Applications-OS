@@ -38,8 +38,26 @@
           <p class="text-gray-400 mt-1">Macro-view monitoring of all active university program submissions and workloads.</p>
         </div>
 
+        <!-- Tab Switcher for Officer Lead -->
+        <div class="flex bg-gray-900/60 p-1.5 rounded-xl border border-gray-800 self-start shrink-0">
+          <button
+            @click="activeView = 'kanban'"
+            class="px-4 py-2 text-xs font-bold rounded-lg transition"
+            :class="activeView === 'kanban' ? 'bg-brand-600 text-white' : 'text-gray-400 hover:text-white'"
+          >
+            Admissions Pipeline
+          </button>
+          <button
+            @click="activeView = 'workload'"
+            class="px-4 py-2 text-xs font-bold rounded-lg transition"
+            :class="activeView === 'workload' ? 'bg-brand-600 text-white' : 'text-gray-400 hover:text-white'"
+          >
+            Officer Workloads & Stats
+          </button>
+        </div>
+
         <!-- Dynamic Workload Filter Dropdown -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-900/60 border border-gray-800 p-3 rounded-2xl shrink-0">
+        <div v-if="activeView === 'kanban'" class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-900/60 border border-gray-800 p-3 rounded-2xl shrink-0">
           <label for="officer-filter" class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
             Filter by Officer:
           </label>
@@ -87,7 +105,7 @@
       </div>
 
       <!-- Kanban Layout -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" v-else>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" v-else-if="activeView === 'kanban'">
         
         <!-- Column 1: READY_FOR_APP -->
         <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[750px] relative overflow-hidden">
@@ -348,6 +366,70 @@
           </div>
         </div>
       </div>
+
+      <!-- OFFICER WORKLOADS & STATS GRID -->
+      <div v-else-if="activeView === 'workload'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          v-for="officer in applicationOfficers"
+          :key="officer._id"
+          class="glass-panel p-6 rounded-2xl border border-gray-800 flex flex-col justify-between space-y-6 relative overflow-hidden bg-slate-900/40"
+        >
+          <!-- Glow background decor -->
+          <div class="absolute -top-12 -right-12 w-24 h-24 bg-brand-500/5 rounded-full blur-2xl"></div>
+
+          <div class="space-y-4">
+            <!-- Officer Header info -->
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-white text-lg">{{ officer.name }}</h4>
+                <p class="text-xs text-gray-400 mt-0.5">{{ officer.email }}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 border border-green-500/20 text-green-300">
+                Active
+              </span>
+            </div>
+
+            <!-- Active Workload visual meter -->
+            <div class="space-y-2 pt-2 border-t border-gray-900">
+              <div class="flex justify-between text-xs font-semibold text-gray-400">
+                <span>Active Load Capacity</span>
+                <span>{{ getOfficerStats(officer._id).total }} / 10 cases</span>
+              </div>
+              <div class="w-full h-2 bg-gray-900 border border-gray-800 overflow-hidden relative rounded-full">
+                <div
+                  class="h-full bg-brand-500 transition-all duration-500 rounded-full"
+                  :style="{ width: `${Math.min((getOfficerStats(officer._id).total / 10) * 100, 100)}%` }"
+                  :class="getOfficerStats(officer._id).total >= 8 ? 'bg-red-500' : getOfficerStats(officer._id).total >= 5 ? 'bg-yellow-500' : 'bg-brand-500'"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats grid -->
+          <div class="grid grid-cols-2 gap-3 pt-4 border-t border-gray-900">
+            <div class="p-3 bg-gray-900/30 rounded-xl border border-gray-900">
+              <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Admissions Review</div>
+              <div class="text-lg font-bold text-purple-400 mt-1">{{ getOfficerStats(officer._id).progress }}</div>
+            </div>
+            <div class="p-3 bg-gray-900/30 rounded-xl border border-gray-900">
+              <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Decisions Pending</div>
+              <div class="text-lg font-bold text-orange-400 mt-1">{{ getOfficerStats(officer._id).pending }}</div>
+            </div>
+            <div class="p-3 bg-gray-900/30 rounded-xl border border-gray-900">
+              <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Correction Returns</div>
+              <div class="text-lg font-bold text-red-400 mt-1">{{ getOfficerStats(officer._id).returns }}</div>
+            </div>
+            <div class="p-3 bg-gray-900/30 rounded-xl border border-gray-900">
+              <div class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Approved Success</div>
+              <div class="text-lg font-bold text-green-400 mt-1">{{ getOfficerStats(officer._id).won }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="applicationOfficers.length === 0" class="col-span-3 text-center py-20 text-gray-500 italic">
+          No application officers registered under your organization.
+        </div>
+      </div>
     </main>
   </div>
 
@@ -432,6 +514,22 @@ const applicantsStore = useApplicantsStore();
 const loading = ref(true);
 const selectedOfficerId = ref('');
 const applicationOfficers = ref([]);
+
+const activeView = ref('kanban');
+
+const getOfficerStats = (officerId) => {
+  const all = applicantsStore.applicants || [];
+  const assigned = all.filter(a => a.assignedOfficer && a.assignedOfficer._id === officerId);
+  return {
+    total: assigned.length,
+    ready: assigned.filter(a => a.status === 'READY_FOR_APP').length,
+    progress: assigned.filter(a => a.status === 'APP_IN_PROGRESS').length,
+    pending: assigned.filter(a => a.status === 'DECISION_PENDING').length,
+    returns: assigned.filter(a => a.returnRequested).length,
+    won: assigned.filter(a => a.status === 'CLOSED_WON').length,
+    lost: assigned.filter(a => a.status === 'CLOSED_LOST').length
+  };
+};
 
 const showReturnConfirmModal = ref(false);
 const selectedReturnApplicantId = ref('');
