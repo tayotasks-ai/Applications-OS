@@ -248,5 +248,43 @@ export const useApplicantsStore = defineStore('applicants', {
         this.loading = false;
       }
     },
+
+    async requestReturn(id, reason) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await fetch(`${API_URL}/applicants/${id}/request-return`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            ...this.getAuthHeaders(),
+          },
+          body: JSON.stringify({ reason }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to request return to counseling.');
+
+        if (this.currentApplicant && this.currentApplicant._id === id) {
+          this.currentApplicant.returnRequested = true;
+          this.currentApplicant.returnRequestReason = reason;
+        }
+
+        // Update list
+        const idx = this.applicants.findIndex(a => a._id === id);
+        if (idx !== -1) {
+          this.applicants[idx].returnRequested = true;
+          this.applicants[idx].returnRequestReason = reason;
+        }
+
+        return data;
+      } catch (err) {
+        console.error('Request return error:', err);
+        this.error = err.message || 'Server error requesting return.';
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });

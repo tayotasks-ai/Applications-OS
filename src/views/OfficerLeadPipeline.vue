@@ -90,7 +90,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" v-else>
         
         <!-- Column 1: READY_FOR_APP -->
-        <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[700px] relative overflow-hidden">
+        <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[750px] relative overflow-hidden">
           <div class="absolute -top-12 -left-12 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
           
           <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4 shrink-0 relative z-10">
@@ -109,17 +109,55 @@
               :key="app._id"
               class="p-4 rounded-xl glass-card border border-gray-800/80 flex flex-col space-y-3"
             >
+              <!-- return request warning block -->
+              <div v-if="app.returnRequested" class="p-2.5 rounded-lg bg-orange-950/40 border border-orange-500/20 text-orange-400 text-xs flex flex-col space-y-1 shrink-0">
+                <div class="font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0 animate-pulse"></span>
+                  Return Requested
+                </div>
+                <div class="italic">"{{ app.returnRequestReason }}"</div>
+                <button
+                  @click="approveReturn(app._id)"
+                  class="mt-1.5 py-1 px-2.5 rounded bg-orange-600 hover:bg-orange-500 text-white text-[10px] font-extrabold uppercase transition text-center shadow shadow-orange-500/20"
+                >
+                  Approve & Return
+                </button>
+              </div>
+
               <div @click="viewDetail(app._id)" class="grow space-y-2">
                 <div class="font-bold text-white text-base hover:text-brand-300 transition">{{ app.firstName }} {{ app.lastName }}</div>
                 <div class="text-xs text-brand-400 font-semibold uppercase tracking-wider">{{ app.intakeData?.courseOfInterest }}</div>
                 <div class="text-xs text-gray-400">{{ app.intakeData?.schoolOfChoice }} ({{ app.intakeData?.intendedLocation }})</div>
               </div>
               
+              <!-- Dispatch/Officer Assignment Dropdown -->
+              <div class="pt-2 flex flex-col space-y-1 shrink-0">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Assign Officer:</label>
+                <select
+                  :value="app.assignedOfficer?._id || ''"
+                  @change="assignOfficer(app._id, $event.target.value)"
+                  class="glass-input text-[11px] px-2 py-1 rounded-lg border font-medium text-white bg-gray-900/60 w-full"
+                >
+                  <option value="">Unassigned ⚠️</option>
+                  <option
+                    v-for="officer in applicationOfficers"
+                    :key="officer._id"
+                    :value="officer._id"
+                  >
+                    {{ officer.name }}
+                  </option>
+                </select>
+              </div>
+
               <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-1.5 bg-gray-900/60 px-2 py-1 rounded-lg border border-gray-800 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-                  <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
-                  <span>{{ app.assignedOfficer ? app.assignedOfficer.name.split(' ')[0] : 'Unassigned' }}</span>
-                </div>
+                <button
+                  v-if="!app.returnRequested"
+                  @click="approveReturn(app._id)"
+                  class="px-2 py-1 rounded border border-gray-700 hover:border-red-500 hover:text-red-400 text-[10px] font-bold transition"
+                >
+                  Return to Counselor
+                </button>
+                <div v-else></div>
                 <button
                   @click="promoteStatus(app._id, 'APP_IN_PROGRESS')"
                   class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center space-x-1 shadow shadow-blue-500/10"
@@ -135,7 +173,7 @@
         </div>
 
         <!-- Column 2: APP_IN_PROGRESS -->
-        <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[700px] relative overflow-hidden">
+        <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[750px] relative overflow-hidden">
           <div class="absolute -top-12 -left-12 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl"></div>
 
           <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4 shrink-0 relative z-10">
@@ -154,17 +192,55 @@
               :key="app._id"
               class="p-4 rounded-xl glass-card border border-gray-800/80 flex flex-col space-y-3"
             >
+              <!-- return request warning block -->
+              <div v-if="app.returnRequested" class="p-2.5 rounded-lg bg-orange-950/40 border border-orange-500/20 text-orange-400 text-xs flex flex-col space-y-1 shrink-0">
+                <div class="font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0 animate-pulse"></span>
+                  Return Requested
+                </div>
+                <div class="italic">"{{ app.returnRequestReason }}"</div>
+                <button
+                  @click="approveReturn(app._id)"
+                  class="mt-1.5 py-1 px-2.5 rounded bg-orange-600 hover:bg-orange-500 text-white text-[10px] font-extrabold uppercase transition text-center shadow shadow-orange-500/20"
+                >
+                  Approve & Return
+                </button>
+              </div>
+
               <div @click="viewDetail(app._id)" class="grow space-y-2">
                 <div class="font-bold text-white text-base hover:text-brand-300 transition">{{ app.firstName }} {{ app.lastName }}</div>
                 <div class="text-xs text-brand-400 font-semibold uppercase tracking-wider">{{ app.intakeData?.courseOfInterest }}</div>
                 <div class="text-xs text-gray-400">{{ app.intakeData?.schoolOfChoice }} ({{ app.intakeData?.intendedLocation }})</div>
               </div>
               
+              <!-- Dispatch/Officer Assignment Dropdown -->
+              <div class="pt-2 flex flex-col space-y-1 shrink-0">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Assign Officer:</label>
+                <select
+                  :value="app.assignedOfficer?._id || ''"
+                  @change="assignOfficer(app._id, $event.target.value)"
+                  class="glass-input text-[11px] px-2 py-1 rounded-lg border font-medium text-white bg-gray-900/60 w-full"
+                >
+                  <option value="">Unassigned ⚠️</option>
+                  <option
+                    v-for="officer in applicationOfficers"
+                    :key="officer._id"
+                    :value="officer._id"
+                  >
+                    {{ officer.name }}
+                  </option>
+                </select>
+              </div>
+
               <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-1.5 bg-gray-900/60 px-2 py-1 rounded-lg border border-gray-800 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-                  <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
-                  <span>{{ app.assignedOfficer ? app.assignedOfficer.name.split(' ')[0] : 'Unassigned' }}</span>
-                </div>
+                <button
+                  v-if="!app.returnRequested"
+                  @click="approveReturn(app._id)"
+                  class="px-2 py-1 rounded border border-gray-700 hover:border-red-500 hover:text-red-400 text-[10px] font-bold transition"
+                >
+                  Return to Counselor
+                </button>
+                <div v-else></div>
                 <button
                   @click="promoteStatus(app._id, 'DECISION_PENDING')"
                   class="px-2.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center space-x-1 shadow shadow-purple-500/10"
@@ -180,7 +256,7 @@
         </div>
 
         <!-- Column 3: DECISION_PENDING -->
-        <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[700px] relative overflow-hidden">
+        <div class="glass-panel p-5 rounded-2xl border border-gray-800 flex flex-col h-[750px] relative overflow-hidden">
           <div class="absolute -top-12 -left-12 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl"></div>
 
           <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4 shrink-0 relative z-10">
@@ -199,18 +275,56 @@
               :key="app._id"
               class="p-4 rounded-xl glass-card border border-gray-800/80 flex flex-col space-y-3"
             >
+              <!-- return request warning block -->
+              <div v-if="app.returnRequested" class="p-2.5 rounded-lg bg-orange-950/40 border border-orange-500/20 text-orange-400 text-xs flex flex-col space-y-1 shrink-0">
+                <div class="font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0 animate-pulse"></span>
+                  Return Requested
+                </div>
+                <div class="italic">"{{ app.returnRequestReason }}"</div>
+                <button
+                  @click="approveReturn(app._id)"
+                  class="mt-1.5 py-1 px-2.5 rounded bg-orange-600 hover:bg-orange-500 text-white text-[10px] font-extrabold uppercase transition text-center shadow shadow-orange-500/20"
+                >
+                  Approve & Return
+                </button>
+              </div>
+
               <div @click="viewDetail(app._id)" class="grow space-y-2">
                 <div class="font-bold text-white text-base hover:text-brand-300 transition">{{ app.firstName }} {{ app.lastName }}</div>
                 <div class="text-xs text-brand-400 font-semibold uppercase tracking-wider">{{ app.intakeData?.courseOfInterest }}</div>
                 <div class="text-xs text-gray-400">{{ app.intakeData?.schoolOfChoice }} ({{ app.intakeData?.intendedLocation }})</div>
               </div>
               
+              <!-- Dispatch/Officer Assignment Dropdown -->
+              <div class="pt-2 flex flex-col space-y-1 shrink-0">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Assign Officer:</label>
+                <select
+                  :value="app.assignedOfficer?._id || ''"
+                  @change="assignOfficer(app._id, $event.target.value)"
+                  class="glass-input text-[11px] px-2 py-1 rounded-lg border font-medium text-white bg-gray-900/60 w-full"
+                >
+                  <option value="">Unassigned ⚠️</option>
+                  <option
+                    v-for="officer in applicationOfficers"
+                    :key="officer._id"
+                    :value="officer._id"
+                  >
+                    {{ officer.name }}
+                  </option>
+                </select>
+              </div>
+
               <div class="pt-3 border-t border-gray-800 flex flex-col space-y-2.5 shrink-0">
                 <div class="flex justify-between items-center w-full">
-                  <div class="flex items-center gap-1.5 bg-gray-900/60 px-2 py-1 rounded-lg border border-gray-800 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-                    <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
-                    <span>{{ app.assignedOfficer ? app.assignedOfficer.name.split(' ')[0] : 'Unassigned' }}</span>
-                  </div>
+                  <button
+                    v-if="!app.returnRequested"
+                    @click="approveReturn(app._id)"
+                    class="px-2 py-1 rounded border border-gray-700 hover:border-red-500 hover:text-red-400 text-[10px] font-bold transition"
+                  >
+                    Return
+                  </button>
+                  <div v-else></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 w-full">
                   <button
@@ -254,7 +368,7 @@ const applicationOfficers = ref([]);
 
 const API_URL = 'https://applications-backend-zpxu.onrender.com/api';
 
-// Fetch users to populate Team Lead workload filters
+// Fetch users to populate Team Lead workload filters and card dropdowns
 const fetchOfficers = async () => {
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -304,6 +418,37 @@ const getOfficerActiveCount = (officerId) => {
   return allApplicants.filter(
     app => app.assignedOfficer && app.assignedOfficer._id === officerId
   ).length;
+};
+
+// Dispatch officer assignment updates from card dropdowns
+const assignOfficer = async (id, officerId) => {
+  try {
+    loading.value = true;
+    await applicantsStore.updateApplicantIntake(id, { assignedOfficer: officerId || null });
+    await loadData();
+    alert('Success: Case assigned to officer.');
+  } catch (err) {
+    alert('Failed to assign officer: ' + err.message);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Senior Officer approves lead return to counseling department
+const approveReturn = async (id) => {
+  if (!confirm('Are you sure you want to approve returning this applicant back to counseling? It will clear officer assignments.')) {
+    return;
+  }
+  try {
+    loading.value = true;
+    await applicantsStore.updateApplicantStatus(id, 'IN_COUNSELING');
+    await loadData();
+    alert('Success: Applicant returned back to Counseling.');
+  } catch (err) {
+    alert('Failed to return applicant: ' + err.message);
+  } finally {
+    loading.value = false;
+  }
 };
 
 // Status transition state promotion handlers

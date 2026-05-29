@@ -40,19 +40,19 @@ const routes = [
     path: '/counselor/dashboard',
     name: 'CounselorDashboard',
     component: CounselorDashboard,
-    meta: { requiresAuth: true, roles: ['Counselor', 'Admin'] }
+    meta: { requiresAuth: true, roles: ['Counselor', 'CounselorLead', 'Admin'] }
   },
   {
     path: '/counselor/intake',
     name: 'CounselorIntake',
     component: CounselorIntake,
-    meta: { requiresAuth: true, roles: ['Counselor', 'Admin'] }
+    meta: { requiresAuth: true, roles: ['Counselor', 'CounselorLead', 'Admin'] }
   },
   {
     path: '/counselor/applicant/:id',
     name: 'ApplicantDetail',
     component: ApplicantDetail,
-    meta: { requiresAuth: true, roles: ['Counselor', 'Admin'] }
+    meta: { requiresAuth: true, roles: ['Counselor', 'CounselorLead', 'Admin'] }
   },
   {
     path: '/officer/pipeline',

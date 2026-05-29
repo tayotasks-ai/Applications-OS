@@ -61,17 +61,27 @@
             <div
               v-for="app in getColumnApplicants('READY_FOR_APP')"
               :key="app._id"
-              class="p-4 rounded-xl glass-card border border-gray-800/80 cursor-pointer flex flex-col space-y-3"
+              class="p-4 rounded-xl glass-card border border-gray-800/80 flex flex-col space-y-3"
             >
-              <div @click="viewDetail(app._id)" class="grow space-y-2">
+              <!-- Return requested pending indicator -->
+              <div v-if="app.returnRequested" class="p-2 rounded bg-orange-950/20 border border-orange-500/25 text-orange-400 text-[10px] font-bold tracking-wider uppercase animate-pulse shrink-0">
+                🕒 Return Pending Approval
+              </div>
+
+              <div @click="viewDetail(app._id)" class="grow space-y-2 cursor-pointer">
                 <div class="font-bold text-white text-base hover:text-brand-300 transition">{{ app.firstName }} {{ app.lastName }}</div>
                 <div class="text-xs text-brand-400 font-semibold">{{ app.intakeData?.courseOfInterest }}</div>
                 <div class="text-xs text-gray-400">{{ app.intakeData?.schoolOfChoice }} ({{ app.intakeData?.intendedLocation }})</div>
               </div>
               <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
-                <router-link :to="`/officer/applicant/${app._id}`" class="text-xs font-semibold text-brand-400 hover:text-brand-300 transition flex items-center">
-                  Review &rarr;
-                </router-link>
+                <button
+                  v-if="!app.returnRequested"
+                  @click="openReturnModal(app._id)"
+                  class="px-2 py-1 rounded border border-gray-700 hover:border-orange-500 hover:text-orange-400 text-[10px] font-bold transition font-sans"
+                >
+                  Request Return
+                </button>
+                <div v-else></div>
                 <button
                   @click="promoteStatus(app._id, 'APP_IN_PROGRESS')"
                   class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center space-x-1"
@@ -105,17 +115,27 @@
             <div
               v-for="app in getColumnApplicants('APP_IN_PROGRESS')"
               :key="app._id"
-              class="p-4 rounded-xl glass-card border border-gray-800/80 cursor-pointer flex flex-col space-y-3"
+              class="p-4 rounded-xl glass-card border border-gray-800/80 flex flex-col space-y-3"
             >
-              <div @click="viewDetail(app._id)" class="grow space-y-2">
+              <!-- Return requested pending indicator -->
+              <div v-if="app.returnRequested" class="p-2 rounded bg-orange-950/20 border border-orange-500/25 text-orange-400 text-[10px] font-bold tracking-wider uppercase animate-pulse shrink-0">
+                🕒 Return Pending Approval
+              </div>
+
+              <div @click="viewDetail(app._id)" class="grow space-y-2 cursor-pointer">
                 <div class="font-bold text-white text-base hover:text-brand-300 transition">{{ app.firstName }} {{ app.lastName }}</div>
                 <div class="text-xs text-brand-400 font-semibold">{{ app.intakeData?.courseOfInterest }}</div>
                 <div class="text-xs text-gray-400">{{ app.intakeData?.schoolOfChoice }} ({{ app.intakeData?.intendedLocation }})</div>
               </div>
               <div class="pt-3 border-t border-gray-800 flex items-center justify-between shrink-0">
-                <router-link :to="`/officer/applicant/${app._id}`" class="text-xs font-semibold text-brand-400 hover:text-brand-300 transition flex items-center">
-                  Review &rarr;
-                </router-link>
+                <button
+                  v-if="!app.returnRequested"
+                  @click="openReturnModal(app._id)"
+                  class="px-2 py-1 rounded border border-gray-700 hover:border-orange-500 hover:text-orange-400 text-[10px] font-bold transition font-sans"
+                >
+                  Request Return
+                </button>
+                <div v-else></div>
                 <button
                   @click="promoteStatus(app._id, 'DECISION_PENDING')"
                   class="px-2.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center space-x-1"
@@ -149,18 +169,28 @@
             <div
               v-for="app in getColumnApplicants('DECISION_PENDING')"
               :key="app._id"
-              class="p-4 rounded-xl glass-card border border-gray-800/80 cursor-pointer flex flex-col space-y-3"
+              class="p-4 rounded-xl glass-card border border-gray-800/80 flex flex-col space-y-3"
             >
-              <div @click="viewDetail(app._id)" class="grow space-y-2">
+              <!-- Return requested pending indicator -->
+              <div v-if="app.returnRequested" class="p-2 rounded bg-orange-950/20 border border-orange-500/25 text-orange-400 text-[10px] font-bold tracking-wider uppercase animate-pulse shrink-0">
+                🕒 Return Pending Approval
+              </div>
+
+              <div @click="viewDetail(app._id)" class="grow space-y-2 cursor-pointer">
                 <div class="font-bold text-white text-base hover:text-brand-300 transition">{{ app.firstName }} {{ app.lastName }}</div>
                 <div class="text-xs text-brand-400 font-semibold">{{ app.intakeData?.courseOfInterest }}</div>
                 <div class="text-xs text-gray-400">{{ app.intakeData?.schoolOfChoice }} ({{ app.intakeData?.intendedLocation }})</div>
               </div>
               <div class="pt-3 border-t border-gray-800 flex flex-col space-y-2 shrink-0">
                 <div class="flex justify-between w-full">
-                  <router-link :to="`/officer/applicant/${app._id}`" class="text-xs font-semibold text-brand-400 hover:text-brand-300 transition flex items-center">
-                    Review &rarr;
-                  </router-link>
+                  <button
+                    v-if="!app.returnRequested"
+                    @click="openReturnModal(app._id)"
+                    class="px-2 py-1 rounded border border-gray-700 hover:border-orange-500 hover:text-orange-400 text-[10px] font-bold transition font-sans"
+                  >
+                    Request Return
+                  </button>
+                  <div v-else></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-1 w-full">
                   <button
@@ -185,11 +215,61 @@
         </div>
       </div>
     </main>
+
+    <!-- CLASSMorphic REQUEST RETURN MODAL -->
+    <div
+      v-if="showReturnModal"
+      class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-gray-950/70 backdrop-blur-sm"
+    >
+      <div class="w-full max-w-md glass-panel p-8 rounded-2xl shadow-2xl relative overflow-hidden space-y-6">
+        <!-- Glow accent -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-orange-500 rounded-full blur-3xl opacity-15"></div>
+
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+          <h3 class="text-xl font-extrabold text-white">Request Counseling Return</h3>
+          <button @click="closeReturnModal" class="text-gray-400 hover:text-white transition text-lg">&times;</button>
+        </div>
+
+        <form @submit.prevent="submitReturnRequest" class="space-y-4">
+          <div>
+            <label for="return-reason" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+              Reason for correction return
+            </label>
+            <textarea
+              id="return-reason"
+              rows="4"
+              required
+              v-model="returnReason"
+              class="glass-input block w-full px-4 py-2.5 rounded-xl text-sm border resize-none"
+              placeholder="e.g. CV requires signatures; destination preference changed."
+            ></textarea>
+          </div>
+
+          <div class="pt-4 flex space-x-3">
+            <button
+              type="button"
+              @click="closeReturnModal"
+              class="w-1/2 py-3 rounded-xl border border-gray-700 hover:border-gray-500 text-sm font-semibold text-gray-300 hover:text-white transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="submittingReturn"
+              class="w-1/2 py-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold transition shadow shadow-orange-500/20 disabled:opacity-50"
+            >
+              <span v-if="submittingReturn" class="inline-block animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+              Submit Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useApplicantsStore } from '../stores/applicants';
@@ -199,6 +279,12 @@ const authStore = useAuthStore();
 const applicantsStore = useApplicantsStore();
 
 const applicants = computed(() => applicantsStore.applicants);
+
+// Return Request Modal State
+const showReturnModal = ref(false);
+const submittingReturn = ref(false);
+const returnReason = ref('');
+const targetApplicantId = ref('');
 
 const loadData = () => {
   applicantsStore.fetchApplicants();
@@ -210,6 +296,31 @@ onMounted(() => {
 
 const getColumnApplicants = (status) => {
   return applicants.value.filter(app => app.status === status);
+};
+
+const openReturnModal = (id) => {
+  targetApplicantId.value = id;
+  showReturnModal.value = true;
+};
+
+const closeReturnModal = () => {
+  showReturnModal.value = false;
+  returnReason.value = '';
+  targetApplicantId.value = '';
+};
+
+const submitReturnRequest = async () => {
+  submittingReturn.value = true;
+  try {
+    await applicantsStore.requestReturn(targetApplicantId.value, returnReason.value);
+    closeReturnModal();
+    loadData(); // refresh list
+    alert('Success: Return request sent to senior officer.');
+  } catch (err) {
+    alert('Failed to request return: ' + err.message);
+  } finally {
+    submittingReturn.value = false;
+  }
 };
 
 const promoteStatus = async (id, nextStatus) => {
