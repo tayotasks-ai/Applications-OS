@@ -319,8 +319,12 @@ const formatDate = (dateStr) => {
 };
 
 const goBack = () => {
-  if (authStore.value.isCounselor) {
+  if (authStore.value.isRoot) {
+    router.push('/root/dashboard');
+  } else if (authStore.value.isAdmin || authStore.value.isCounselor) {
     router.push('/counselor/dashboard');
+  } else if (authStore.value.isOfficerLead) {
+    router.push('/lead/pipeline');
   } else {
     router.push('/officer/pipeline');
   }
@@ -369,10 +373,43 @@ const selectPlan = async (planTier) => {
 };
 
 onMounted(async () => {
-  if (route.query.payment === 'success') {
+  const paymentReference = route.query.reference || route.query.trxref;
+  
+  if (route.query.payment === 'success' || paymentReference) {
+    checkoutLoading.value = true;
     triggerToast("Payment successful! Synchronizing active subscription status...", "success");
-    // Trigger reactive user profile refresh from backend
-    await authStore.value.fetchCurrentUser();
+    
+    if (paymentReference) {
+      try {
+        const API_URL = 'https://applications-backend-zpxu.onrender.com/api';
+        const response = await fetch(`${API_URL}/billing/verify-payment`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authStore.value.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ reference: paymentReference })
+        });
+        
+        const data = await response.json();
+        if (response.ok && data.tenant) {
+          // Reactively sync the Pinia auth store tenant details
+          authStore.value.user.tenant = data.tenant;
+          localStorage.setItem('user', JSON.stringify(authStore.value.user));
+          triggerToast("Plan successfully updated to Growth!", "success");
+        } else {
+          // Fallback to fetchCurrentUser in case of validation delays
+          await authStore.value.fetchCurrentUser();
+        }
+      } catch (err) {
+        console.error("Direct payment verification failed:", err);
+        await authStore.value.fetchCurrentUser();
+      }
+    } else {
+      await authStore.value.fetchCurrentUser();
+    }
+    
+    checkoutLoading.value = false;
     // Clean up URL query parameters
     router.replace({ query: {} });
   }

@@ -109,6 +109,9 @@ export const useAuthStore = defineStore('auth', {
 
         if (response.ok) {
           const userData = await response.json();
+          if (userData.tenantId) {
+            userData.tenant = userData.tenantId;
+          }
           this.user = userData;
           localStorage.setItem('user', JSON.stringify(userData));
         } else {
