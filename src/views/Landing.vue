@@ -159,7 +159,7 @@
             <div class="text-4xl font-black text-white">₦0 <span class="text-xs text-gray-500 font-normal">/ forever</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">Perfect for solo counselors starting out educational lead intake.</p>
             <ul class="text-xs text-gray-300 space-y-3 pt-4 border-t border-gray-800/60">
-              <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 1 Counselor Seat Limit</li>
+              <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 2 Counselor Seats Limit</li>
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 25 Active Applicants Limit</li>
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 2GB Storage Limit</li>
             </ul>
@@ -180,7 +180,7 @@
             <div class="text-4xl font-black text-white">₦25,000 <span class="text-xs text-gray-500 font-normal">/ month</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">For expanding travel consultancy agencies with multiple active counselors.</p>
             <ul class="text-xs text-gray-300 space-y-3 pt-4 border-t border-gray-800/60">
-              <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 15 Counselor Seats Limit</li>
+              <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 50 Counselor Seats Limit</li>
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> Unlimited Active Applicants</li>
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> 50GB Storage Limit</li>
             </ul>
@@ -197,7 +197,7 @@
         <div class="glass-panel p-8 rounded-2xl border border-gray-800 flex flex-col justify-between h-[420px]">
           <div class="space-y-4">
             <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Enterprise</h4>
-            <div class="text-4xl font-black text-white">₦75,000 <span class="text-xs text-gray-500 font-normal">/ month</span></div>
+            <div class="text-4xl font-black text-white">₦100,000 <span class="text-xs text-gray-500 font-normal">/ month</span></div>
             <p class="text-xs text-gray-400 leading-relaxed">For massive global organizations with zero limitations on metrics.</p>
             <ul class="text-xs text-gray-300 space-y-3 pt-4 border-t border-gray-800/60">
               <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2.5"></span> Unlimited Counselor Seats</li>

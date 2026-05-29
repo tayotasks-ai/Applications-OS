@@ -298,7 +298,7 @@ const activeApplicants = computed(() => authStore.value.user?.tenant?.currentApp
 const activeStorage = computed(() => authStore.value.user?.tenant?.storageUsedGB || 0);
 
 const maxSeats = computed(() => {
-  if (orgPlan.value === 'Free') return 1;
+  if (orgPlan.value === 'Free') return 2;
   if (orgPlan.value === 'Growth') return 50;
   return Infinity;
 });
